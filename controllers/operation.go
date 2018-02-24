@@ -34,3 +34,39 @@ func GetOperation(c *gin.Context) {
 	}
 	c.JSON(200, req)
 }
+
+func CreateOperation(c *gin.Context) {
+	var req = new(utils.ReqData)
+	name := c.PostForm("name")
+	value := c.PostForm("value")
+	o := &models.Operation{Name: name, Value: value}
+	err := o.Insert()
+	if err == nil {
+		req.SetResult(0, []int{})
+	} else {
+		req.SetResult(100, err.Error())
+	}
+	c.JSON(200, req)
+}
+
+func UpdateOperation(c *gin.Context) {
+	var req = new(utils.ReqData)
+	id, _err := strconv.Atoi(c.Param("id"))
+	name := c.PostForm("name")
+	value := c.PostForm("value")
+
+	// 参数判断
+	if _err != nil {
+		req.SetResult(101, []int{})
+		c.JSON(200, req)
+	}
+
+	o := &models.Operation{Id: id, Name: name, Value: value}
+	err := o.Update()
+	if err == nil {
+		req.SetResult(0, []int{})
+	} else {
+		req.SetResult(100, err.Error())
+	}
+	c.JSON(200, req)
+}
