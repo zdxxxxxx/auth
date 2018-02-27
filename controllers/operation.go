@@ -25,6 +25,7 @@ func GetOperation(c *gin.Context) {
 	if _err != nil {
 		req.SetResult(101, []int{})
 		c.JSON(200, req)
+		return
 	}
 	o, err := models.GetOperationById(id)
 	if err == nil {
@@ -37,8 +38,16 @@ func GetOperation(c *gin.Context) {
 
 func CreateOperation(c *gin.Context) {
 	var req = new(utils.ReqData)
-	name := c.PostForm("name")
-	value := c.PostForm("value")
+	data := &OperationClientJson{}
+	_err := c.BindJSON(data)
+	// 参数判断
+	if _err != nil {
+		req.SetResult(101, []int{})
+		c.JSON(200, req)
+		return
+	}
+	name := data.Name
+	value := data.Value
 	o := &models.Operation{Name: name, Value: value}
 	err := o.Insert()
 	if err == nil {
@@ -51,18 +60,38 @@ func CreateOperation(c *gin.Context) {
 
 func UpdateOperation(c *gin.Context) {
 	var req = new(utils.ReqData)
-	id, _err := strconv.Atoi(c.Param("id"))
-	name := c.PostForm("name")
-	value := c.PostForm("value")
-
+	data := &OperationClientJson{}
+	_err := c.BindJSON(data)
+	id, _err1 := strconv.Atoi(c.Param("id"))
 	// 参数判断
-	if _err != nil {
+	if _err != nil || _err1 != nil {
 		req.SetResult(101, []int{})
 		c.JSON(200, req)
+		return
 	}
-
+	name := data.Name
+	value := data.Value
 	o := &models.Operation{Id: id, Name: name, Value: value}
 	err := o.Update()
+	if err == nil {
+		req.SetResult(0, []int{})
+	} else {
+		req.SetResult(100, err.Error())
+	}
+	c.JSON(200, req)
+}
+
+func DeleteOperation(c *gin.Context) {
+	var req = new(utils.ReqData)
+	id, _err1 := strconv.Atoi(c.Param("id"))
+	// 参数判断
+	if _err1 != nil {
+		req.SetResult(101, []int{})
+		c.JSON(200, req)
+		return
+	}
+	o := &models.Operation{Id: id}
+	err := o.Delete()
 	if err == nil {
 		req.SetResult(0, []int{})
 	} else {

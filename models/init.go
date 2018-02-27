@@ -7,7 +7,7 @@ import (
 )
 
 type BaseModel struct {
-	ID        uint      `gorm:"primary_key" json:"id"`
+	Id        uint      `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time `json:"create_at"`
 	UpdatedAt time.Time `json:"update_at"`
 }
@@ -26,8 +26,11 @@ func InitDB() (*gorm.DB, error) {
 		//init casbin
 		InitCasbin()
 		DB = db
-		//db.LogMode(true)
-		db.AutoMigrate(&Operation{}, &App{}, &Resource{})
+		db.LogMode(true)
+		db.AutoMigrate(&Operation{}, &App{}, &Resource{}, &Auth{},&UserAuth{})
+		db.Model(&Auth{}).AddForeignKey("resource_id", "mfw_auth_resources(id)", "CASCADE", "NO ACTION")
+		db.Model(&UserAuth{}).AddForeignKey("auth_id", "mfw_auth_auths(id)", "CASCADE", "NO ACTION")
+
 		return db, err
 	}
 	return nil, err

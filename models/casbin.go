@@ -13,14 +13,14 @@ func InitCasbin() {
 	e = casbin.NewEnforcer("conf/rbac_model.conf", adapter)
 }
 
-func CheckAuth(params ...interface{}) {
+func CheckAuth(params ...interface{}) bool {
 	// casbin init
 	e.LoadPolicy()
-	e.Enforce(params...)
+	return e.Enforce(params...)
 }
 
-func AddAuth(params ...interface{}) {
-	e.AddPolicy(params...)
+func AddAuth(params ...interface{}) bool {
+	return e.AddPolicy(params...)
 }
 
 func DeleteAuth(params ...interface{}) {
