@@ -25,11 +25,13 @@ func (o *App) UpdateContent() error {
 		"content": o.Content,
 	}).Error
 }
+
 func (o *App) UpdateResourceId() error {
 	return DB.Model(o).Updates(map[string]interface{}{
 		"resource_id": o.ResourceId,
 	}).Error
 }
+
 func (o *App) UpdateStatus() error {
 	return DB.Model(o).Updates(map[string]interface{}{
 		"status": o.Status,
@@ -45,6 +47,7 @@ func GetAppById(id uint) (*App, error) {
 	err := DB.First(&o, "id = ?", id).Error
 	return &o, err
 }
+
 func GetAppAll() ([]*App, error) {
 	var ops []*App
 	err := DB.Find(&ops).Error

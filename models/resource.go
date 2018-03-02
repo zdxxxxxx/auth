@@ -41,7 +41,22 @@ func GetResourceByAppId(id uint) ([]*Resource, error) {
 	err := DB.Find(&rows, "app_id = ?", id).Error
 	return rows, err
 }
-
+func GetResourceByPath(id uint) ([]*Resource, error) {
+	var e error
+	var rows []*Resource
+	r, err := GetResourceById(id)
+	if err == nil {
+		_err := DB.Find(&rows, "app_id=? AND path LIKE ?", r.AppId, "%"+r.Path+"%").Error
+		if _err == nil {
+			return rows, e
+		} else {
+			e = _err
+		}
+	} else {
+		e = err
+	}
+	return rows, e
+}
 func DeleteResources(id uint) error {
 	var e error
 	r, err := GetResourceById(id)

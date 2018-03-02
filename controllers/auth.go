@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"auth2/models"
 	"strconv"
+	"fmt"
 )
 
 func CreateAuth(c *gin.Context) {
@@ -20,7 +21,7 @@ func CreateAuth(c *gin.Context) {
 	app_id := data.AppId
 	path := data.Path
 	ops := data.Operations
-	d := &reqAuthsData{}
+	d := &reqResourceData{}
 	r := &models.Resource{AppId: uint(app_id), Path: path}
 	err := r.Insert()
 	if err == nil {
@@ -112,7 +113,31 @@ func GetAuth(c *gin.Context) {
 	for _, i := range auths {
 		ops = append(ops, i.OperationId)
 	}
-	data := &reqAuthsData{ResourceId: r.Id, Path: r.Path, Operations: ops}
+	data := &reqResourceData{ResourceId: r.Id, Path: r.Path, Operations: ops}
 	req.SetResult(0, data)
+	c.JSON(200, req)
+}
+
+func GetAuths(c *gin.Context) {
+	var req = new(utils.ReqData)
+	id := c.Param("id");
+	_id, _err := strconv.ParseUint(id, 10, 64)
+	// 参数判断
+	if _err != nil {
+		req.SetResult(101, []int{})
+		c.JSON(200, req)
+		return
+	}
+	rs, _ := models.GetResourceByPath(uint(_id))
+	fmt.Println(rs)
+	var auths []*reqAuthData
+	for _, item := range rs {
+		as, _ := models.GetAuthsByResourceId(uint(item.Id))
+		for _, a := range as {
+			o, _ := models.GetOperationById(a.OperationId)
+			auths = append(auths, &reqAuthData{AuthId: a.Id, Path: item.Path, Operation: o.Name})
+		}
+	}
+	req.SetResult(0, auths)
 	c.JSON(200, req)
 }

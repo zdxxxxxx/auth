@@ -28,6 +28,7 @@ func InitRouter() *gin.Engine {
 	v1.PUT("auth/:id", controllers.UpdateAuth)
 	v1.DELETE("auth/:id", controllers.DeleteAuth)
 	v1.GET("auth/:id", controllers.GetAuth)
+	v1.GET("auths/:id", controllers.GetAuths)
 	// 授权
 	v1.POST("authorize", controllers.CreateUserAuth)
 
