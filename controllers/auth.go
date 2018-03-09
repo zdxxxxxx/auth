@@ -19,7 +19,7 @@ func CreateAuth(c *gin.Context) {
 		return
 	}
 	app_id := data.AppId
-	path := data.Path
+	path := utils.BuildPath(data.Path)
 	ops := data.Operations
 	d := &reqResourceData{}
 	r := &models.Resource{AppId: uint(app_id), Path: path}
@@ -77,19 +77,19 @@ func UpdateAuth(c *gin.Context) {
 		c.JSON(200, req)
 		return
 	}
-	path := data.Path
+	path := utils.BuildPath(data.Path)
 	ops := data.Operations
 	err := models.UpdateResources(uint(_id), path)
 	if err == nil {
-		models.DeleteAuthByResourceId(uint(_id))
-		for _, item := range ops {
-			a := &models.Auth{ResourceId: uint(_id), OperationId: item}
-			e := a.Insert()
-			if e != nil {
-				panic(e)
-				break
-			}
+		auths, _ := models.GetAuthsByResourceId(uint(_id));
+		var old_ops []int
+		for _, item := range auths {
+			old_ops = append(old_ops, item.OperationId);
 		}
+		remove_auths := utils.DiffIntSlice(old_ops, ops);
+		add_auths := utils.DiffIntSlice(ops, old_ops);
+		fmt.Println(remove_auths, add_auths)
+
 		req.SetResult(0, []int{})
 	} else {
 		req.SetResult(100, err.Error())

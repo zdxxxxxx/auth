@@ -3,8 +3,8 @@ package models
 type Auth struct {
 	BaseModel
 	Resource    Resource `gorm:"foreignkey:ResourceId"`
-	ResourceId  uint
-	OperationId int
+	ResourceId  uint     `gorm:"not null"`
+	OperationId int      `gorm:"not null"`
 }
 
 func (o *Auth) Insert() error {

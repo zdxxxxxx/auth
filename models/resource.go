@@ -6,7 +6,7 @@ import (
 
 type Resource struct {
 	BaseModel
-	AppId uint   `json:"app_id"`
+	AppId uint   `json:"app_id" gorm:"not null"`
 	Name  string `json:"name"`
 	Path  string `json:"path" gorm:"not null;unique"`
 }

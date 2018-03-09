@@ -5,6 +5,7 @@ import (
 	"auth2/utils"
 	"auth2/models"
 	"fmt"
+	"strconv"
 )
 
 func CreateUserAuth(c *gin.Context) {
@@ -53,4 +54,28 @@ func CheckAuth(c *gin.Context) {
 	result := models.CheckAuth(uid, path, op)
 	req.SetResult(0, result)
 	c.JSON(200, req)
+}
+
+func DeleteUserAuth(c *gin.Context) {
+	var req = new(utils.ReqData)
+	id, _err1 := strconv.Atoi(c.Param("id"))
+	// 参数判断
+	if _err1 != nil {
+		req.SetResult(101, []int{})
+		c.JSON(200, req)
+		return
+	}
+	o := new(models.UserAuth)
+	o.Id = uint(id)
+	err := o.Delete()
+	if err == nil {
+		req.SetResult(0, []int{})
+	} else {
+		req.SetResult(100, err.Error())
+	}
+	c.JSON(200, req)
+}
+
+func GetUserAuth(c *gin.Context) {
+
 }

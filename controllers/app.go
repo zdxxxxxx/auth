@@ -49,7 +49,7 @@ func CreateApp(c *gin.Context) {
 	}
 	name := data.Name
 	desc := data.Desc
-	path := data.Path
+	path := utils.BuildPath(data.Path)
 	o := &models.App{Name: name, Desc: desc}
 	err := o.Insert()
 	if err == nil {

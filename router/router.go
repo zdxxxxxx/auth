@@ -31,7 +31,8 @@ func InitRouter() *gin.Engine {
 	v1.GET("auths/:id", controllers.GetAuths)
 	// 授权
 	v1.POST("authorize", controllers.CreateUserAuth)
-
+	v1.GET("authorize", controllers.GetUserAuth)
+	v1.DELETE("authorize", controllers.DeleteUserAuth)
 	// 鉴权
 	v1.POST("check", controllers.CheckAuth)
 	return router
