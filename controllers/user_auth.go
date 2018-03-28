@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"auth2/utils"
 	"auth2/models"
-	"fmt"
 	"strconv"
 )
 
@@ -22,12 +21,12 @@ func CreateUserAuth(c *gin.Context) {
 	uid := data.Uid
 	auth := data.Auth
 	for _, i := range auth {
-		ua := &models.UserAuth{Uid: uid, AuthId: uint(i)}
-		ua.Insert()
 		a, _ := models.GetAuthById(uint(i))
 		r, _ := models.GetResourceById(a.ResourceId)
+		app, _ := models.GetAppById(r.AppId)
 		o, _ := models.GetOperationById(a.OperationId)
-		fmt.Println(uid, r.Path, o.Value)
+		ua := &models.UserAuth{Uid: uid, AuthId: uint(i), AppId: app.Id, Path: r.Path}
+		ua.Insert()
 		e = models.AddAuth(uid, r.Path, o.Value)
 	}
 	if e {
@@ -65,9 +64,40 @@ func DeleteUserAuth(c *gin.Context) {
 		c.JSON(200, req)
 		return
 	}
-	o := new(models.UserAuth)
-	o.Id = uint(id)
-	err := o.Delete()
+	ua, _ := models.GetUserAuthById(uint(id))
+	a, _ := models.GetAuthById(ua.AuthId)
+	r, _ := models.GetResourceById(a.ResourceId)
+	o, _ := models.GetOperationById(a.OperationId)
+	models.DeleteAuth(ua.Uid, r.Path, o.Value)
+	err := ua.Delete()
+	if err == nil {
+		req.SetResult(0, []int{})
+	} else {
+		req.SetResult(100, err.Error())
+	}
+	c.JSON(200, req)
+}
+
+func DeleteUserAuths(c *gin.Context) {
+	var req = new(utils.ReqData)
+	resData := &IdsData{}
+	_err := c.BindJSON(resData)
+	// 参数判断
+	if _err != nil {
+		req.SetResult(101, []int{})
+		c.JSON(200, req)
+		return
+	}
+	var err error
+	ids := resData.Ids
+	for _, id := range ids {
+		ua, _ := models.GetUserAuthById(uint(id))
+		a, _ := models.GetAuthById(ua.AuthId)
+		r, _ := models.GetResourceById(a.ResourceId)
+		o, _ := models.GetOperationById(a.OperationId)
+		models.DeleteAuth(ua.Uid, r.Path, o.Value)
+		err = ua.Delete()
+	}
 	if err == nil {
 		req.SetResult(0, []int{})
 	} else {
@@ -77,5 +107,30 @@ func DeleteUserAuth(c *gin.Context) {
 }
 
 func GetUserAuth(c *gin.Context) {
-
+	var req = new(utils.ReqData)
+	uid := c.Query("uid")
+	app := c.Query("app")
+	path := c.Query("path")
+	appId, _ := strconv.Atoi(app)
+	uas, err := models.GetUserAuth(uid, appId, path)
+	var datas = make([]*utils.UserAuthReqData, 0)
+	for _, ua := range uas {
+		var data = new(utils.UserAuthReqData)
+		auth, _ := models.GetAuthById(ua.AuthId)
+		op, _ := models.GetOperationById(auth.OperationId)
+		re, _ := models.GetResourceById(auth.ResourceId)
+		app, _ := models.GetAppById(re.AppId)
+		data.Id = int(ua.Id)
+		data.Path = re.Path
+		data.Uid = ua.Uid
+		data.App = app.Name
+		data.Operation = op.Name
+		datas = append(datas, data)
+	}
+	if err == nil {
+		req.SetResult(0, datas)
+	} else {
+		req.SetResult(100, err.Error())
+	}
+	c.JSON(200, req)
 }

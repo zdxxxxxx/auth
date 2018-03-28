@@ -18,6 +18,21 @@ func GetApps(c *gin.Context) {
 	}
 	c.JSON(200, req)
 }
+
+func GetAppSelect(c *gin.Context) {
+	var req = new(utils.ReqData)
+	var datas = make([]*utils.AppReqData, 0)
+	o, err := models.GetAppAll()
+	for _, item := range o {
+		datas = append(datas, &utils.AppReqData{Id: int(item.Id), Name: item.Name})
+	}
+	if err == nil {
+		req.SetResult(0, datas)
+	} else {
+		req.SetResult(100, err)
+	}
+	c.JSON(200, req)
+}
 func GetApp(c *gin.Context) {
 	var req = new(utils.ReqData)
 	id, _err := strconv.Atoi(c.Param("id"))

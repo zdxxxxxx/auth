@@ -22,6 +22,7 @@ func InitRouter() *gin.Engine {
 	v1.PUT("app/:id", controllers.UpdateApp)
 	v1.DELETE("app/:id", controllers.DeleteApp)
 	v1.PATCH("app/:id", controllers.UpdateAppContent)
+	v1.GET("app_select_options", controllers.GetAppSelect)
 
 	// 权限
 	v1.POST("auth", controllers.CreateAuth)
@@ -32,7 +33,9 @@ func InitRouter() *gin.Engine {
 	// 授权
 	v1.POST("authorize", controllers.CreateUserAuth)
 	v1.GET("authorize", controllers.GetUserAuth)
-	v1.DELETE("authorize", controllers.DeleteUserAuth)
+	v1.DELETE("authorize/:id", controllers.DeleteUserAuth)
+	v1.POST("authorizes", controllers.DeleteUserAuths)
+
 	// 鉴权
 	v1.POST("check", controllers.CheckAuth)
 	return router

@@ -57,6 +57,9 @@ func DeleteAuth(c *gin.Context) {
 	r := new(models.Resource)
 	r.Id = uint(_id)
 	err := models.DeleteResources(uint(_id))
+
+	a, _ := models.DeleteAuthByResourceId(uint(_id))
+	models.DeleteUserAuthByAuth(a)
 	if err == nil {
 		req.SetResult(0, []int{})
 	} else {
@@ -86,10 +89,16 @@ func UpdateAuth(c *gin.Context) {
 		for _, item := range auths {
 			old_ops = append(old_ops, item.OperationId);
 		}
-		remove_auths := utils.DiffIntSlice(old_ops, ops);
-		add_auths := utils.DiffIntSlice(ops, old_ops);
-		fmt.Println(remove_auths, add_auths)
-
+		remove_ops := utils.DiffIntSlice(old_ops, ops);
+		add_ops := utils.DiffIntSlice(ops, old_ops);
+		for _, remove_id := range remove_ops {
+			a, _ := models.DeleteAuthByRAndO(uint(_id), uint(remove_id));
+			models.DeleteUserAuthByAuth(a)
+		}
+		for _, add_id := range add_ops {
+			a := &models.Auth{ResourceId: uint(_id), OperationId: add_id}
+			a.Insert()
+		}
 		req.SetResult(0, []int{})
 	} else {
 		req.SetResult(100, err.Error())

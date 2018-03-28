@@ -2,9 +2,8 @@ package models
 
 type Auth struct {
 	BaseModel
-	Resource    Resource `gorm:"foreignkey:ResourceId"`
-	ResourceId  uint     `gorm:"not null"`
-	OperationId int      `gorm:"not null"`
+	ResourceId  uint `gorm:"not null"`
+	OperationId int  `gorm:"not null"`
 }
 
 func (o *Auth) Insert() error {
@@ -33,6 +32,12 @@ func GetAuthsByResourceId(id uint) ([]*Auth, error) {
 	err := DB.Find(&ops, "resource_id = ?", id).Error
 	return ops, err
 }
-func DeleteAuthByResourceId(id uint) error {
-	return DB.Delete(&Auth{}, "resource_id=?", id).Error
+func DeleteAuthByResourceId(id uint) (*Auth, error) {
+	var o Auth
+	return &o, DB.Delete(o, "resource_id=?", id).Error
+}
+
+func DeleteAuthByRAndO(r_id uint, o_id uint) (*Auth, error) {
+	var o Auth
+	return &o, DB.Delete(o, "resource_id=? AND operation_id=?", r_id, o_id).Error
 }

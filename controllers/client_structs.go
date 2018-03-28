@@ -28,3 +28,4 @@ type CheckAuthClientJson struct {
 	Path      string `json:"path"`
 	Operation string `json:"operation"`
 }
+

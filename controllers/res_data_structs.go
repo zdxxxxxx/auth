@@ -14,7 +14,11 @@ type reqResourceData struct {
 }
 
 type reqAuthData struct {
-	AuthId uint `json:"auth_id"`
-	Path string `json:"path"`
+	AuthId    uint   `json:"auth_id"`
+	Path      string `json:"path"`
 	Operation string `json:"operation"`
+}
+
+type IdsData struct {
+	Ids []int `json:"ids"`
 }

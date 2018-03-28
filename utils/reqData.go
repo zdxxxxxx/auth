@@ -14,6 +14,19 @@ type ReqData struct {
 	Data interface{} `json:"data"`
 }
 
+type UserAuthReqData struct {
+	Id        int    `json:"id"`
+	Uid       string `json:"uid"`
+	App       string `json:"app"`
+	Path      string `json:"path"`
+	Operation string `json:"operation"`
+}
+
+type AppReqData struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func (r *ReqData) SetResult(s int, d interface{}) {
 	r.Code = s
 	r.Msg = status[s]

@@ -28,8 +28,6 @@ func InitDB() (*gorm.DB, error) {
 		DB = db
 		db.LogMode(true)
 		db.AutoMigrate(&Operation{}, &App{}, &Resource{}, &Auth{}, &UserAuth{})
-		db.Model(&Auth{}).AddForeignKey("resource_id", "mfw_auth_resources(id)", "CASCADE", "NO ACTION")
-		db.Model(&UserAuth{}).AddForeignKey("auth_id", "mfw_auth_auths(id)", "CASCADE", "NO ACTION")
 		db.Model(&Auth{}).AddUniqueIndex("idx_resourceId_operationId", "resource_id", "operation_id")
 		return db, err
 	}
